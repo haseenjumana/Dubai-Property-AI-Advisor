@@ -18,10 +18,16 @@ bathrooms = st.number_input("Bathrooms", min_value=0, max_value=10, value=2)
 location = st.selectbox("Location", ["Dubai Marina", "Downtown Dubai", "Deira", "Bur Dubai", "JLT"])
 
 if st.button("Predict Price"):
-    # ✅ Corrected order of features
     input_data = pd.DataFrame([[location, area, bedrooms, bathrooms]],
                               columns=["location", "area", "bedrooms", "bathrooms"])
     
-    prediction = model.predict(input_data)[0]
-    st.success(f"Estimated Price: AED {int(prediction):,}")
+    st.write("📊 Input Data Preview:")
+    st.write(input_data)
+
+    try:
+        prediction = model.predict(input_data)[0]
+        st.success(f"Estimated Price: AED {int(prediction):,}")
+    except Exception as e:
+        st.error(f"🚨 Prediction failed: {e}")
+
 
