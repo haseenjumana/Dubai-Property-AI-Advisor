@@ -1,41 +1,42 @@
 import pandas as pd
-import pickle
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
+import joblib
 
-# Sample training data
+# Sample dataset
 data = pd.DataFrame({
-    "area": [1000, 1500, 800, 1200, 950],
-    "bedrooms": [2, 3, 1, 2, 2],
-    "bathrooms": [2, 2, 1, 2, 1],
-    "location": ["Dubai Marina", "Downtown Dubai", "Deira", "JLT", "Bur Dubai"],
-    "price": [1400000, 2000000, 800000, 1500000, 1200000]
+    "area": [1000, 1500, 2000, 1200, 1800],
+    "bedrooms": [2, 3, 4, 2, 3],
+    "bathrooms": [2, 2, 3, 2, 3],
+    "location": ["Dubai Marina", "Downtown Dubai", "Deira", "Bur Dubai", "JLT"],
+    "price": [1400000, 2000000, 1600000, 1500000, 1800000]
 })
 
-X = data[["location", "area", "bedrooms", "bathrooms"]]
+X = data[["area", "bedrooms", "bathrooms", "location"]]
 y = data["price"]
 
-# Preprocessing
+# Preprocessing for categorical features
 preprocessor = ColumnTransformer(
     transformers=[
         ("cat", OneHotEncoder(), ["location"])
     ],
-    remainder="passthrough"
+    remainder='passthrough'
 )
 
-# Full pipeline
-pipeline = Pipeline([
+# Create pipeline
+model = Pipeline(steps=[
     ("preprocessor", preprocessor),
     ("regressor", LinearRegression())
 ])
 
-# Train and save
-pipeline.fit(X, y)
+# Train model
+model.fit(X, y)
 
-with open("model.pkl", "wb") as f:
-    pickle.dump(pipeline, f)
+# Save model using joblib
+joblib.dump(model, "model.pkl")
 
-print("✅ Trained and saved new pipeline model.")
+print("✅ Model trained and saved as model.pkl")
+
 
