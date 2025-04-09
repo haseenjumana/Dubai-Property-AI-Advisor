@@ -1,13 +1,11 @@
 import pandas as pd
-import numpy as np
 import pickle
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 
-# ✅ Step 1: Sample data
+# Sample training data
 data = pd.DataFrame({
     "area": [1000, 1500, 800, 1200, 950],
     "bedrooms": [2, 3, 1, 2, 2],
@@ -16,31 +14,28 @@ data = pd.DataFrame({
     "price": [1400000, 2000000, 800000, 1500000, 1200000]
 })
 
-# ✅ Step 2: Split features/target
-X = data.drop("price", axis=1)
+X = data[["location", "area", "bedrooms", "bathrooms"]]
 y = data["price"]
 
-# ✅ Step 3: Preprocessing for categorical data
-categorical_features = ["location"]
-categorical_transformer = OneHotEncoder()
-
+# Preprocessing
 preprocessor = ColumnTransformer(
-    transformers=[("cat", categorical_transformer, categorical_features)],
-    remainder="passthrough"  # Keep other columns (area, bedrooms, bathrooms)
+    transformers=[
+        ("cat", OneHotEncoder(), ["location"])
+    ],
+    remainder="passthrough"
 )
 
-# ✅ Step 4: Create pipeline
-model = Pipeline(steps=[
+# Full pipeline
+pipeline = Pipeline([
     ("preprocessor", preprocessor),
     ("regressor", LinearRegression())
 ])
 
-# ✅ Step 5: Train
-model.fit(X, y)
+# Train and save
+pipeline.fit(X, y)
 
-# ✅ Step 6: Save full pipeline
 with open("model.pkl", "wb") as f:
-    pickle.dump(model, f)
+    pickle.dump(pipeline, f)
 
-print("✅ Model trained and saved as model.pkl")
+print("✅ Trained and saved new pipeline model.")
 
